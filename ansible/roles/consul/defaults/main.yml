@@ -1,0 +1,11 @@
+---
+# file: roles/consul/defaults/main.yml
+datacenter: dc1
+required_boostrap_count: 1
+consul:
+  version: 1.9.0
+  user: consul
+  group: consul
+  data_dir: /opt/consul
+  log_dir: /var/log/consul/
+  conf_dir: /etc/consul.d/

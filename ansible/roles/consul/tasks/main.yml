@@ -1,0 +1,71 @@
+---
+# file: roles/consul/tasks/main.yml
+- debug:
+    msg: "{{ nodes }}"
+
+- name: Create Consul group
+  group:
+    name: "{{ consul.group }}"
+    state: present
+
+- name: Create Consul user
+  user:
+    name: "{{ consul.user }}"
+    group: "{{ consul.group }}"
+    state: present
+
+- name: Download Consul
+  get_url:
+    url: "https://releases.hashicorp.com/consul/{{ consul.version }}/consul_{{ consul.version }}_linux_amd64.zip"
+    dest: "/tmp/consul-{{ consul.version }}.zip"
+    mode: 0644
+
+- name: Unpack Consul
+  unarchive:
+    src: "/tmp/consul-{{ consul.version }}.zip"
+    dest: /usr/bin/
+    remote_src: yes
+    mode: 0755
+
+- name: Create Consul dirs
+  file:
+    path: "{{ item }}"
+    owner: "{{ consul.user }}"
+    group: "{{ consul.group }}"
+    recurse: yes
+    mode: 0755
+  with_items:
+    - "{{ consul.conf_dir }}"
+    - "{{ consul.data_dir }}"
+    - "{{ consul.log_dir }}"
+
+- name: Generate secret
+  run_once: yes
+  block:
+    - shell: consul keygen
+      register: consul_key
+
+    - set_fact:
+        encrypted_value: "{{ consul_key.stdout }}"
+
+- name: Create Consul config
+  template:
+    src: consul.hcl.j2
+    dest: "{{ consul.conf_dir }}/consul.hcl"
+    owner: "{{ consul.user }}"
+    group: "{{ consul.group }}"
+    mode: 0755
+
+- name: Create Consul systemd service
+  template:
+    src: consul.service.j2
+    dest: /etc/systemd/system/consul.service
+  notify:
+    - "reload systemd"
+
+- name: Restart Consul
+  become: yes
+  service:
+    state: restarted
+    name: consul.service
+    enabled: yes

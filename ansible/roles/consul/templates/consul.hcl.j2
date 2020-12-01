@@ -1,0 +1,22 @@
+datacenter = "{{ datacenter }}"
+server = true
+bootstrap_expect = {{ required_boostrap_count }}
+retry_join = [{{ nodes }}]
+client_addr = "0.0.0.0"
+bind_addr = "{{ ansible_ssh_host }}"
+advertise_addr = "{{ ansible_ssh_host }}"
+
+data_dir = "{{ consul.data_dir }}"
+log_file = "{{ consul.log_dir }}"
+
+encrypt = "{{ encrypted_value }}"
+
+ui_config {
+  enabled = true
+}
+ports {
+  http = 8500
+}
+telemetry {
+  disable_compat_1.9 = true
+}

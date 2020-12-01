@@ -1,0 +1,13 @@
+---
+# file: inventories/local/group_vars/consul.yml
+firewall:
+  enabled: true
+  rules:
+    - { port: "8300", direction: "in", protocol: "tcp", policy: "allow", description: "Server RPC" }
+    - { port: "8301", direction: "in", protocol: "any", policy: "allow", description: "Serf WAN port" }
+    - { port: "8302", direction: "in", protocol: "any", policy: "allow", description: "Serf LAN port" }
+    - { port: "8500", direction: "in", protocol: "tcp", policy: "allow", description: "HTTP API" }
+    - { port: "8600", direction: "in", protocol: "any", policy: "allow", description: "DNS server" }
+
+required_boostrap_count: 3
+nodes: "{{ groups['consul'] | map('extract', hostvars, ['ansible_host']) | map('to_json') | join(',') }}"

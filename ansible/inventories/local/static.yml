@@ -1,0 +1,16 @@
+---
+# file: inventories/local/static.yml
+all:
+  hosts:
+    consul1:
+      ansible_host: "192.168.53.10"
+    consul2:
+      ansible_host: "192.168.53.11"
+    consul3:
+      ansible_host: "192.168.53.12"
+  children:
+    consul:
+      hosts:
+        consul1:
+        consul2:
+        consul3:

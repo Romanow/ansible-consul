@@ -1,0 +1,6 @@
+---
+# file: consul.yml
+- hosts: consul
+  become: yes
+  roles:
+    - consul
